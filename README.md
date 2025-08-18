@@ -1,3 +1,4 @@
+
 # HireFlow LangGraph
 
 **HireFlow LangGraph** is a candidate recruitment workflow system built with **LangGraph** and **Streamlit**. It automates candidate evaluation, skill assessment, and routing to HR interviews or recruiter review, streamlining the hiring process.
@@ -24,6 +25,7 @@
 * Routes candidates to HR interview, recruiter review, or rejection
 * Integrates with CV parsing and LLM services
 * Extensible and configurable using LangGraph
+* **HR can now add a job description and upload multiple CVs** for batch candidate evaluation
 
 ## Installation
 
@@ -54,10 +56,11 @@ streamlit run app.py
 
 Steps:
 
-1. Upload a candidate CV (PDF, DOCX, or TXT).
-2. Preview the extracted CV text.
-3. Candidate info is extracted automatically using the LLM.
-4. The workflow runs, and the final decision is displayed:
+1. Upload one or multiple candidate CVs (PDF, DOCX, or TXT).
+2. Optionally, add a **job description** for the role.
+3. Preview the extracted CV text for each candidate.
+4. Candidate info is extracted automatically using the LLM.
+5. The workflow runs for each candidate, and the final decision is displayed:
 
    * Schedule HR interview
    * Escalate to recruiter
@@ -77,6 +80,8 @@ Steps:
 2. The script extracts text from the CV and extracts candidate info using the LLM.
 3. A `CandidateState` is created and the workflow is executed.
 4. The final decision is printed to the console.
+
+> Note: CLI mode currently supports **one CV at a time**. For batch uploads and job descriptions, use the Streamlit web app.
 
 ## Project Structure
 
@@ -109,18 +114,22 @@ hireflow-langgraph/
 The workflow is implemented using **LangGraph** and consists of the following nodes:
 
 1. **categorize\_experience** – Categorizes candidates based on experience.
+
 2. **assess\_skillset** – Evaluates candidate skills and decides the next step.
+
 3. Conditional routing from `assess_skillset`:
 
    * `recruiter` → escalates the candidate for recruiter review
    * `reject` → rejects the candidate
    * `hr` → schedules an HR interview
+
 4. **escalate\_to\_recruiter**, **reject\_application**, **schedule\_hr\_interview** – Terminal nodes that complete the workflow.
 
 Additional services:
 
 * **CV Parser** (`services/cv_parser.py`) – Extracts text from uploaded CVs.
 * **LLM Wrapper** (`services/llm.py`) – Handles interactions with large language models for candidate analysis.
+* **Job Description & Batch CV Handling** – HR can provide a job description and upload multiple CVs. The system automatically processes all candidates and outputs workflow decisions for each.
 
 ## Contributing
 
@@ -129,3 +138,5 @@ Contributions are welcome. Submit issues or pull requests to improve functionali
 ## License
 
 This project is licensed under the MIT License.
+
+
