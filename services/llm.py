@@ -24,6 +24,7 @@ def call_llm(prompt: str) -> str:
     data = response.json()
     return data['choices'][0]['message']['content']
 
+
 def extract_candidate_info(cv_text: str) -> dict:
     """
     Extract candidate info from CV text using the LLM.
@@ -69,3 +70,60 @@ CV Text:
         }
 
     return candidate_info
+
+
+def match_candidate_to_job(cv_text: str, job_description: str) -> dict:
+    """
+    Compare candidate CV against job description.
+    Returns dict: {
+      "name": "...",
+      "years_experience": ...,
+      "skills": [...],
+      "match_score": ...,
+      "reasoning": "..."
+    }
+    """
+    prompt = f"""
+You are an AI recruitment assistant. Given a job description and a candidate CV, 
+extract candidate info and evaluate the match.
+
+Return ONLY a single JSON object with the following fields:
+{{
+  "name": "Full Name",
+  "years_experience": <number>,
+  "skills": ["skill1", "skill2", ...],
+  "match_score": <0-100>,
+  "reasoning": "short explanation why candidate matches or not"
+}}
+
+Job Description:
+{job_description}
+
+Candidate CV:
+{cv_text}
+"""
+
+    response_text = call_llm(prompt)
+
+    try:
+        match = re.search(r'\{.*\}', response_text, re.DOTALL)
+        if match:
+            result = json.loads(match.group())
+        else:
+            result = {
+                "name": "Unknown",
+                "years_experience": 0,
+                "skills": [],
+                "match_score": 0,
+                "reasoning": "Could not extract candidate info."
+            }
+    except json.JSONDecodeError:
+        result = {
+            "name": "Unknown",
+            "years_experience": 0,
+            "skills": [],
+            "match_score": 0,
+            "reasoning": "Invalid JSON from LLM."
+        }
+
+    return result

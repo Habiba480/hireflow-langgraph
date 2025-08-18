@@ -9,4 +9,5 @@ class CandidateState(BaseModel):
     years_experience: Optional[int] = None
     skills: List[str] = []
     experience: Optional[Literal["junior", "mid", "senior"]] = None
+    job_description: str = ""
     decision: Optional[Literal["recruiter", "reject", "hr"]] = None
